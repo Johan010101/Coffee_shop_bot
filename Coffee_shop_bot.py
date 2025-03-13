@@ -3,13 +3,11 @@ import tkinter.font as tkFont
 from tkinter import ttk
 import pyttsx3
 import random
-import time
 
-def speak(text, rate=140, use_random_effects=True, volume=1.0):
-    """Speaks the given text with enhanced random effects."""
+def speak(text, rate=150, use_random_effects=True):
+    """Speaks the given text with optional random effects."""
     engine = pyttsx3.init()
     engine.setProperty('rate', rate)
-    engine.setProperty('volume', volume)
 
     if use_random_effects:
         apply_random_effects(engine, text)
@@ -20,44 +18,25 @@ def speak(text, rate=140, use_random_effects=True, volume=1.0):
     engine.stop()
 
 def apply_random_effects(engine, text):
-    """Applies a wider range of random speech effects to the text."""
+    """Applies random speech effects to the text."""
     words = text.split()
     new_words = []
-    for i, word in enumerate(words):
+    for word in words:
         new_words.append(word)
-
-        # Pause after punctuation
-        if word.endswith(('.', ',', '!', '?')) and random.random() < 0.5:
-          time.sleep(random.uniform(0.3, 0.6))
-
-        # Random interjection
-        if random.random() < 0.1:  # 10% chance
-            interjection = random.choice(["uh", "um", "err", "like", "you know", "well"])
-            new_words.append(interjection)
-
-        # Pitch variation
-        if random.random() < 0.05:
-            current_rate = engine.getProperty('rate')
-            engine.setProperty('rate', random.uniform(current_rate - 15, current_rate + 15))
-
-        # Volume Variation
-        if random.random() < 0.05:
-            engine.setProperty('volume', random.uniform(0.7, 1.0))
-
-        # Word emphasis
-        if random.random() < 0.03:  # 3% chance
-            current_volume = engine.getProperty('volume')
-            engine.setProperty('volume', random.uniform(1.0, 1.3))
-            engine.say(word)
+        if random.random() < 0.1:  # 10% chance for a random effect
+            engine.setProperty('rate', random.randint(100, 200))  # Vary rate
+            new_words.append(random.choice(["uh", "um", "err"])) # Random interjection
+        elif random.random() < 0.05: #5% chance to pause
+            engine.say("")
             engine.runAndWait()
-            engine.setProperty('volume', current_volume)
+            engine.setProperty('rate', random.randint(130, 170))
+            engine.setProperty('volume', random.uniform(0.6,1.0)) # Vary volume slightly.
+        elif random.random() < 0.03:
+            engine.setProperty('rate', random.randint(100, 200))  # Vary rate
+            engine.setProperty('volume', random.uniform(0.6,1.0)) # Vary volume slightly.
 
-        # Reset rate before the next word
-        engine.setProperty('rate', 140)
-
-    engine.say(" ".join(new_words))
-    engine.runAndWait()
-    engine.setProperty('rate', 140)  # Reset rate
+    engine.say(" ".join(new_words)) #Join the words and speak it.
+    engine.setProperty('rate', 120)  # Reset rate
     engine.setProperty('volume', 1.0) # Reset volume
 
 class Name:
@@ -92,6 +71,7 @@ class Menu:
 
     def display(self):
         menu_string = "\n".join(str(item) for item in self.items)
+        # print(f"Here is our menu:\n{menu_string}")
         speak(f"Here is our menu: {menu_string}")
         return menu_string
 
